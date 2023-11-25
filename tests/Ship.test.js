@@ -2,24 +2,30 @@ import { expect, test } from "vitest";
 import Ship from "../modules/Ship";
 
 test("Ship gets hit", () => {
-  const ship = new Ship([0, 1, 2, 3]);
-  ship.hit(0);
+  const ship = new Ship("carrier");
+  ship.hit();
 
-  expect(ship.hits).toEqual([0]);
+  expect(ship.hits).toEqual(1);
 });
 
 test("Ship takes multiple hits", () => {
-  const ship = new Ship([10, 11, 12, 13]);
-  ship.hit(11);
-  ship.hit(13);
+  const ship = new Ship("carrier");
+  ship.hit();
+  ship.hit();
 
-  expect(ship.hits).toEqual([11, 13]);
+  expect(ship.hits).toEqual(2);
 });
 
 test("Ship gets sunk", () => {
-  const ship = new Ship([0, 1]);
-  ship.hit(0);
-  ship.hit(1);
+  const ship = new Ship("patrol boat");
+  ship.hit();
+  ship.hit();
 
   expect(ship.isSunk()).toBe(true);
+});
+
+test("Ship has correct length", () => {
+  const carrier = new Ship("carrier");
+
+  expect(carrier.length).toBe(5);
 });
