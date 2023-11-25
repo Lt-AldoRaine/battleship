@@ -7,12 +7,14 @@ export default class Ship {
   }
 
   hit() {
-    this.hits += 1;
-    this.length -= 1;
+    if (!this.sunk) {
+      this.hits += 1;
+    }
+    this.isSunk();
   }
 
   isSunk() {
-    return this.length <= 0 ? (this.sunk = true) : (this.sunk = false);
+    return this.hits === this.length ? (this.sunk = true) : (this.sunk = false);
   }
 
   assignLength(name) {
