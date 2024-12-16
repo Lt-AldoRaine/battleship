@@ -1,5 +1,3 @@
-import Ship from "./Ship";
-
 export default class Gameboard {
   constructor() {
     this.board = new Array(10).fill().map(() => new Array(10).fill(" "));
@@ -10,41 +8,77 @@ export default class Gameboard {
   }
 
   placeShip(ship, coords, isVertical = false) {
-    let rowStart = coords.x;
-    let colStart = coords.y;
+    let rowStart = coords.y;
+    let colStart = coords.x;
     let shipCoords = [];
     const shipLength = ship.length;
 
     if (!isVertical) {
-      if (10 - colStart >= shipLength) {
+      if (this.validCell(rowStart, colStart, shipLength, isVertical)) {
         for (let i = 0; i < shipLength; i++) {
-          // prettier-ignore
-          if (this.cellContainsShip({ x: rowStart, y: colStart })) return false;
-          shipCoords.push(colStart);
-          this.board[rowStart].splice(colStart++, 1, ship);
+          shipCoords.push({ x: colStart + i, y: rowStart });
         }
+
+        for (let i = 0; i < shipLength; i++) {
+          if (this.cellContainsShip({ x:shipCoords[i].x, y:shipCoords[i].y })) return false;
+        }
+
+        this.board[rowStart].splice(colStart, shipLength, ...new Array(shipLength).fill(ship))
         this.ships.push(ship);
         this.shipCount += 1;
-        return true;
-      } else return false;
+        return true
+      } else {
+        return false
+      };
     } else {
-      if (10 - rowStart >= shipLength) {
+      if (this.validCell(rowStart, colStart, shipLength, isVertical)) {
         for (let i = 0; i < shipLength; i++) {
-          // prettier-ignore
-          if (this.cellContainsShip({ x: rowStart, y: colStart })) return false;
-          this.board[rowStart++].splice(colStart, 1, ship);
+          shipCoords.push({ x: colStart, y: rowStart + i })
         }
+
+        for (let i = 0; i < shipLength; i++) {
+          if (this.cellContainsShip({ x:shipCoords[i].x, y:shipCoords[i].y })) return false;
+        }
+
+        Array.from({ length: shipLength }, (_, i) => this.board[rowStart + i][colStart] = ship)
         this.ships.push(ship);
         this.shipCount += 1;
-        return true;
-      } else return false;
+        return true
+      } else {
+        return false
+      };
+    }
+  }
+
+
+
+  validCell(row, col, len, isVertical = false) {
+    if (!isVertical) {
+      if (10 - col >= len) {
+        return true
+      } else return false
+    } else {
+      if (10 - row >= len) {
+        return true
+      } else return false
     }
   }
 
   cellContainsShip(coords) {
-    if (this.board[coords.x][coords.y] !== " ") {
-      return true;
-    } else return false;
+    const area = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]]
+
+    for (let [dx, dy] of area) {
+      const newX = coords.x + dx;
+      const newY = coords.y + dy;
+
+      if (newY >= 0 && newY < this.board.length && newX >= 0 && newX < this.board[0].length) {
+        if (this.board[newY][newX] !== " ") {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   recieveAttack(coords) {
@@ -74,15 +108,5 @@ export default class Gameboard {
       this.allShipsSunk = true;
     }
   }
+
 }
-
-let bodr = new Gameboard();
-const submarine = new Ship("submarine");
-
-bodr.placeShip(submarine, { x: 0, y: 2 });
-
-bodr.recieveAttack({ x: 0, y: 2 });
-bodr.recieveAttack({ x: 0, y: 3 });
-bodr.recieveAttack({ x: 0, y: 4 });
-
-console.log(bodr.board);
