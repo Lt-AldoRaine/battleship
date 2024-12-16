@@ -1,3 +1,5 @@
-import displayBoard from "./modules/displayBoard";
+import game from "./modules/Game";
+import { createDom } from "./modules/dom"
 
-displayBoard();
+createDom()
+game()
